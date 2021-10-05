@@ -1,5 +1,7 @@
 import mongoose from 'mongoose'
 import validator from 'validator'
+import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 
 const userSchema = mongoose.Schema(
   {
@@ -43,10 +45,64 @@ const userSchema = mongoose.Schema(
         }
       },
     },
+    tokens: [
+      {
+        token: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
   },
   {
     timestamps: { currentTime: () => Math.floor(Date.now() / 1000) },
   }
 )
 
-export default mongoose.model('user', userSchema)
+// Defining function for hiding private data of users
+userSchema.methods.toJSON = function () {
+  const user = this
+  const userObject = user.toObject()
+
+  delete userObject.password
+  delete userObject.tokens
+
+  return userObject
+}
+
+// generating authentication token and saving to the database
+userSchema.methods.generateAuthToken = async function () {
+  const user = this
+  const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET)
+  user.tokens = user.tokens.concat({ token })
+  await user.save()
+  return token
+}
+
+// Logging in user by email and password
+userSchema.statics.findByCredentials = async (email, password) => {
+  const user = await User.findOne({ email })
+  if (!user) {
+    throw new Error('Unable to login!')
+  }
+  const isMatch = await bcrypt.compare(password, user.password)
+  if (!isMatch) {
+    throw new Error('Unable to login!')
+  }
+  return user
+}
+
+// hashing password before saving the user
+userSchema.pre('save', async function (next) {
+  const user = this
+  if (user.isModified('password')) {
+    const salt = await bcrypt.genSalt(10)
+    user.password = await bcrypt.hash(user.password, salt)
+  }
+  next()
+})
+
+// creating mongoose model for User collection
+const User = mongoose.model('User', userSchema)
+
+export default User
