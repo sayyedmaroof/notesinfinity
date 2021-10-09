@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 import validator from 'validator'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import Note from './Notes.js'
 
 const userSchema = mongoose.Schema(
   {
@@ -55,9 +56,16 @@ const userSchema = mongoose.Schema(
     ],
   },
   {
-    timestamps: { currentTime: () => Math.floor(Date.now() / 1000) },
+    timestamps: true,
   }
 )
+
+// Setting up a virtual property to create relationship between user and notes
+userSchema.virtual('notes', {
+  ref: 'Note',
+  localField: '_id',
+  foreignField: 'user',
+})
 
 // Defining function for hiding private data of users
 userSchema.methods.toJSON = function () {
@@ -99,6 +107,12 @@ userSchema.pre('save', async function (next) {
     const salt = await bcrypt.genSalt(10)
     user.password = await bcrypt.hash(user.password, salt)
   }
+  next()
+})
+
+// deleting the user notes when the user profile deletion
+userSchema.pre('remove', async function (next) {
+  await Note.deleteMany({ user: this._id })
   next()
 })
 

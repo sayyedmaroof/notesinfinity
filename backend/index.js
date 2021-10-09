@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import connectDB from './config/db.js'
 import userRoutes from './routes/userRoutes.js'
 import notesRoutes from './routes/notesRoutes.js'
+import { notFound, errorHandler } from './middleware/errorMiddleware.js'
 
 const app = express()
 
@@ -14,7 +15,9 @@ app.use(express.json())
 app.use('/api/users', userRoutes)
 app.use('/api/notes', notesRoutes)
 
-app.get('/', (req, res) => res.send('Hello world this is my home page'))
+// error handling
+app.use(notFound)
+app.use(errorHandler)
 
 app.listen(process.env.PORT, () =>
   console.log(`App is running on port ${process.env.PORT}`)
