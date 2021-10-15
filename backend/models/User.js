@@ -8,31 +8,31 @@ const userSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
-      minLength: 3,
+      required: [true, 'Please enter your name'],
+      minLength: [3, 'Please enter a name with atleast 3 characters'],
       trim: true,
     },
     email: {
       type: String,
-      required: true,
+      required: [true, 'Please enter your email'],
       unique: true,
       trim: true,
       lowercase: true,
       validate(value) {
         if (!validator.isEmail(value)) {
-          throw new Error('Email is invalid')
+          throw new Error('Please enter a valid email')
         }
       },
     },
     password: {
       type: String,
-      required: true,
-      minLength: 5,
+      required: [true, 'Please enter your password'],
+      minLength: [6, 'Password must be at least 6 characters long!'],
       trim: true,
       validate(pass) {
         if (pass.toLowerCase().includes('password')) {
           throw new Error(
-            'The password should not includes the word password itself'
+            'The password should not includes the word password itself!'
           )
         }
       },
@@ -40,11 +40,7 @@ const userSchema = mongoose.Schema(
     age: {
       type: Number,
       default: 18,
-      validate(value) {
-        if (value < 0) {
-          throw new Error('Age must be a positive number')
-        }
-      },
+      min: [0, 'Age must be a positive integer!'],
     },
     tokens: [
       {
