@@ -6,11 +6,13 @@ const notesSchema = mongoose.Schema(
       type: String,
       required: [true, 'Please enter title!'],
       minLength: [3, 'Title must be atleast 3 characters long'],
+      trim: true,
     },
     description: {
       type: String,
       required: [true, 'Please enter description!'],
-      minLength: [5, 'Title must be atleast 5 characters long'],
+      minLength: [5, 'Description must be atleast 5 characters long'],
+      trim: true,
     },
     tag: {
       type: String,
