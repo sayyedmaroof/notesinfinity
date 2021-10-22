@@ -3,15 +3,15 @@ import { LinkContainer } from 'react-router-bootstrap'
 
 const Header = () => {
   return (
-    <Navbar bg="light" expand="lg">
+    <Navbar bg="primary" variant="dark" expand="lg" collapseOnSelect>
       <Container>
         <LinkContainer to="/">
-          <Navbar.Brand>NotesInfinity</Navbar.Brand>
+          <Navbar.Brand>Notes Infinity</Navbar.Brand>
         </LinkContainer>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto">
-            <LinkContainer to="/">
+          <Nav className="ms-auto">
+            <LinkContainer to="/" exact>
               <Nav.Link>Home</Nav.Link>
             </LinkContainer>
             <LinkContainer to="/about">
