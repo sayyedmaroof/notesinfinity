@@ -1,12 +1,9 @@
-import { useContext } from 'react'
-import NoteContext from '../context/notes/NoteContext'
-import { Button, Card } from 'react-bootstrap'
+import { Card } from 'react-bootstrap'
+import EditModal from './EditModal'
+import DeleteModal from './DeleteModal'
 
 const NoteItem = props => {
   const { note } = props
-
-  const context = useContext(NoteContext)
-  const { deleteNote, editNote } = context
 
   return (
     <Card bg="secondary" text="dark" className="my-2">
@@ -14,20 +11,10 @@ const NoteItem = props => {
       <Card.Body>
         <Card.Title>{note.title}</Card.Title>
         <Card.Text>{note.description}</Card.Text>
-        <Button
-          variant="primary"
-          size="sm"
-          className="mx-2"
-          onClick={() => editNote()}>
-          <i className="fas fa-edit"></i>
-        </Button>
-        <Button
-          variant="primary"
-          size="sm"
-          className="mx-2"
-          onClick={() => deleteNote(note._id)}>
-          <i className="fas fa-trash"></i>
-        </Button>
+
+        <EditModal className="mx-2" note={note} />
+
+        <DeleteModal className="mx-2" note={note} />
       </Card.Body>
     </Card>
   )

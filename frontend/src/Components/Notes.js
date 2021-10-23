@@ -20,7 +20,7 @@ const Notes = () => {
       <h2 className="my-3">Your Notes</h2>
       <Row>
         {notes.map(note => (
-          <Col key={note._id} md={3}>
+          <Col key={note._id} md={4} sm={6} lg={3}>
             <NoteItem note={note} />
           </Col>
         ))}

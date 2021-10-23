@@ -16,24 +16,22 @@ const NoteState = props => {
   const fetchNotes = async () => {
     // api call for fetching notes
     const { data } = await axios.get(`${baseUrl}/notes/mynotes`, { headers })
-    console.log(data)
     // updating client side
     setNotes(data)
   }
 
   // Add a note
   const addNote = async (title, description, tag) => {
-    const note = {
+    const noteBody = {
       title,
       description,
       tag,
     }
 
     // api call
-    const { data } = await axios.post(`${baseUrl}/notes/create`, note, {
+    const { data } = await axios.post(`${baseUrl}/notes/create`, noteBody, {
       headers,
     })
-    console.log(data)
 
     // update in client
     setNotes(notes.concat(data))
@@ -41,28 +39,35 @@ const NoteState = props => {
 
   // Edit a note
   const editNote = async (id, title, description, tag) => {
-    console.log('Was clicked')
-    const toEdit = notes.filter(note => note._id === id)
-    const element = toEdit[0]
-
-    console.log(toEdit)
-
     // Api call using axios
-    // const response = await axios.patch(`${baseUrl}/notes/mynotes/${id}`)
-
-    // setNotes(newNotes)
+    await axios.patch(
+      `${baseUrl}/notes/mynotes/${id}`,
+      { title, description, tag },
+      {
+        headers,
+      }
+    )
+    // Updating in client
+    // fetchNotes() : this will invoke another api call which results in high load on server
+    const newNotes = notes.slice()
+    newNotes.forEach((element, index) => {
+      if (element._id === id) {
+        newNotes[index].title = title
+        newNotes[index].description = description
+        newNotes[index].tag = tag
+      }
+    })
+    setNotes(newNotes)
   }
 
   // Delete a note
   const deleteNote = async id => {
     // Api call to delete note in server
-    const { data } = await axios.delete(`${baseUrl}/notes/mynotes/${id}`, {
+    await axios.delete(`${baseUrl}/notes/mynotes/${id}`, {
       headers,
     })
-    console.log(data)
     // Deleting in client
     const newNotes = notes.filter(note => note._id !== id)
-    console.log(`Deleting this note with ${id}`)
     setNotes(newNotes)
   }
 
