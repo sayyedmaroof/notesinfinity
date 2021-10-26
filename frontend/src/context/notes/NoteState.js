@@ -11,13 +11,27 @@ const headers = {
 
 const NoteState = props => {
   const [notes, setNotes] = useState([])
+  const [error, setError] = useState(null)
 
   // fetch all notes
   const fetchNotes = async () => {
-    // api call for fetching notes
-    const { data } = await axios.get(`${baseUrl}/notes/mynotes`, { headers })
-    // updating client side
-    setNotes(data)
+    try {
+      // api call for fetching notes
+      const response = await axios.get(`${baseUrl}/notes/mynotes`, { headers })
+      // updating client side
+      const data = response.data
+      setNotes(data)
+      setError(null)
+    } catch (err) {
+      if (err.response) {
+        setError({ variant: 'danger', message: err.response.data.error })
+      } else if (err.request) {
+        setError({ variant: 'danger', message: 'No response from server' })
+      } else {
+        setError({ variant: 'danger', message: err.message })
+      }
+      // console.log(error)
+    }
   }
 
   // Add a note
@@ -27,53 +41,90 @@ const NoteState = props => {
       description,
       tag,
     }
-
-    // api call
-    const { data } = await axios.post(`${baseUrl}/notes/create`, noteBody, {
-      headers,
-    })
-
-    // update in client
-    setNotes(notes.concat(data))
+    try {
+      // api call
+      const { data } = await axios.post(`${baseUrl}/notes/create`, noteBody, {
+        headers,
+      })
+      // update in client
+      setNotes(notes.concat(data))
+      setError(null)
+    } catch (err) {
+      if (err.response) {
+        setError({
+          variant: 'danger',
+          message: `Could not add the note! ${err.response.data.error}`,
+        })
+      } else if (err.request) {
+        setError({ variant: 'danger', message: 'No response from server' })
+      } else {
+        setError({ variant: 'danger', message: err.message })
+      }
+    }
   }
 
   // Edit a note
   const editNote = async (id, title, description, tag) => {
-    // Api call using axios
-    await axios.patch(
-      `${baseUrl}/notes/mynotes/${id}`,
-      { title, description, tag },
-      {
-        headers,
+    try {
+      // Api call using axios
+      await axios.patch(
+        `${baseUrl}/notes/mynotes/${id}`,
+        { title, description, tag },
+        {
+          headers,
+        }
+      )
+      // Updating in client
+      // fetchNotes() : this will invoke another api call which results in high load on server
+      const newNotes = notes.slice()
+      newNotes.forEach((element, i) => {
+        if (element._id === id) {
+          newNotes[i].title = title
+          newNotes[i].description = description
+          newNotes[i].tag = tag
+        }
+      })
+      setNotes(newNotes)
+      setError(null)
+    } catch (err) {
+      if (err.response) {
+        setError({
+          variant: 'danger',
+          message: `Could not update the note! ${err.response.data.error}`,
+        })
+      } else if (err.request) {
+        setError({ variant: 'danger', message: 'No response from server' })
+      } else {
+        setError({ variant: 'danger', message: err.message })
       }
-    )
-    // Updating in client
-    // fetchNotes() : this will invoke another api call which results in high load on server
-    const newNotes = notes.slice()
-    newNotes.forEach((element, index) => {
-      if (element._id === id) {
-        newNotes[index].title = title
-        newNotes[index].description = description
-        newNotes[index].tag = tag
-      }
-    })
-    setNotes(newNotes)
+    }
   }
 
   // Delete a note
   const deleteNote = async id => {
-    // Api call to delete note in server
-    await axios.delete(`${baseUrl}/notes/mynotes/${id}`, {
-      headers,
-    })
-    // Deleting in client
-    const newNotes = notes.filter(note => note._id !== id)
-    setNotes(newNotes)
+    try {
+      // Api call to delete note in server
+      await axios.delete(`${baseUrl}/notes/mynotes/${id}`, {
+        headers,
+      })
+      // Deleting in client
+      const newNotes = notes.filter(note => note._id !== id)
+      setNotes(newNotes)
+      setError(null)
+    } catch (err) {
+      if (err.response) {
+        setError({ variant: 'danger', message: err.response.data.error })
+      } else if (err.request) {
+        setError({ variant: 'danger', message: 'No response from server' })
+      } else {
+        setError({ variant: 'danger', message: err.message })
+      }
+    }
   }
 
   return (
     <NoteContext.Provider
-      value={{ notes, fetchNotes, addNote, editNote, deleteNote }}>
+      value={{ notes, error, fetchNotes, addNote, editNote, deleteNote }}>
       {props.children}
     </NoteContext.Provider>
   )

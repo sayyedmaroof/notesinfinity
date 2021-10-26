@@ -5,7 +5,6 @@ import Home from './components/Home'
 import About from './components/About'
 import NoteState from './context/notes/NoteState'
 import { Container } from 'react-bootstrap'
-import AlertMessage from './components/AlertMessage'
 
 function App() {
   return (
@@ -13,7 +12,6 @@ function App() {
       <Router>
         <Header />
         <main className="py-3">
-          <AlertMessage />
           <Container>
             <Route path="/about" exact>
               <About />

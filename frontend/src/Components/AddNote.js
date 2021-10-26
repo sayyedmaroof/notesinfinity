@@ -12,17 +12,18 @@ const AddNote = () => {
     tag: '',
   })
 
-  const addNoteHandler = e => {
-    e.preventDefault()
-    addNote(note.title, note.description, note.tag)
-  }
-
   const onChangeHandler = e => {
     setNote({ ...note, [e.target.name]: e.target.value })
   }
 
+  const addNoteHandler = e => {
+    e.preventDefault()
+    addNote(note.title, note.description, note.tag)
+    setNote({ title: '', description: '', tag: '' })
+  }
+
   return (
-    <div>
+    <>
       <h2 className="my-3">Add a note!</h2>
       <Form onSubmit={addNoteHandler}>
         <Form.Group className="mb-3">
@@ -34,6 +35,7 @@ const AddNote = () => {
             type="text"
             name="title"
             placeholder="Enter title"
+            value={note.title}
             onChange={onChangeHandler}
           />
         </Form.Group>
@@ -47,6 +49,7 @@ const AddNote = () => {
             type="text"
             name="description"
             placeholder="Enter description"
+            value={note.description}
             onChange={onChangeHandler}
           />
         </Form.Group>
@@ -60,6 +63,7 @@ const AddNote = () => {
             type="text"
             name="tag"
             placeholder="Enter tag"
+            value={note.tag}
             onChange={onChangeHandler}
           />
         </Form.Group>
@@ -68,7 +72,7 @@ const AddNote = () => {
           Add Note
         </Button>
       </Form>
-    </div>
+    </>
   )
 }
 
