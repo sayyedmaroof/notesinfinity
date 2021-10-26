@@ -12,14 +12,17 @@ const headers = {
 const NoteState = props => {
   const [notes, setNotes] = useState([])
   const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   // fetch all notes
   const fetchNotes = async () => {
     try {
+      setLoading(true)
       // api call for fetching notes
       const response = await axios.get(`${baseUrl}/notes/mynotes`, { headers })
       // updating client side
       const data = response.data
+      setLoading(false)
       setNotes(data)
       setError(null)
     } catch (err) {
@@ -30,7 +33,7 @@ const NoteState = props => {
       } else {
         setError({ variant: 'danger', message: err.message })
       }
-      // console.log(error)
+      setLoading(false)
     }
   }
 
@@ -43,10 +46,12 @@ const NoteState = props => {
     }
     try {
       // api call
+      setLoading(true)
       const { data } = await axios.post(`${baseUrl}/notes/create`, noteBody, {
         headers,
       })
       // update in client
+      setLoading(false)
       setNotes(notes.concat(data))
       setError(null)
     } catch (err) {
@@ -60,6 +65,7 @@ const NoteState = props => {
       } else {
         setError({ variant: 'danger', message: err.message })
       }
+      setLoading(false)
     }
   }
 
@@ -67,6 +73,7 @@ const NoteState = props => {
   const editNote = async (id, title, description, tag) => {
     try {
       // Api call using axios
+      setLoading(true)
       await axios.patch(
         `${baseUrl}/notes/mynotes/${id}`,
         { title, description, tag },
@@ -84,6 +91,7 @@ const NoteState = props => {
           newNotes[i].tag = tag
         }
       })
+      setLoading(false)
       setNotes(newNotes)
       setError(null)
     } catch (err) {
@@ -93,10 +101,14 @@ const NoteState = props => {
           message: `Could not update the note! ${err.response.data.error}`,
         })
       } else if (err.request) {
-        setError({ variant: 'danger', message: 'No response from server' })
+        setError({
+          variant: 'danger',
+          message: 'Could not delete the note! No response from server',
+        })
       } else {
         setError({ variant: 'danger', message: err.message })
       }
+      setLoading(false)
     }
   }
 
@@ -104,27 +116,44 @@ const NoteState = props => {
   const deleteNote = async id => {
     try {
       // Api call to delete note in server
+      setLoading(true)
       await axios.delete(`${baseUrl}/notes/mynotes/${id}`, {
         headers,
       })
       // Deleting in client
       const newNotes = notes.filter(note => note._id !== id)
+      setLoading(false)
       setNotes(newNotes)
       setError(null)
     } catch (err) {
       if (err.response) {
-        setError({ variant: 'danger', message: err.response.data.error })
+        setError({
+          variant: 'danger',
+          message: `Could not delete the note! ${err.response.data.error}`,
+        })
       } else if (err.request) {
-        setError({ variant: 'danger', message: 'No response from server' })
+        setError({
+          variant: 'danger',
+          message: 'Could not delete the note! No response from server',
+        })
       } else {
         setError({ variant: 'danger', message: err.message })
       }
+      setLoading(false)
     }
   }
 
   return (
     <NoteContext.Provider
-      value={{ notes, error, fetchNotes, addNote, editNote, deleteNote }}>
+      value={{
+        notes,
+        error,
+        loading,
+        fetchNotes,
+        addNote,
+        editNote,
+        deleteNote,
+      }}>
       {props.children}
     </NoteContext.Provider>
   )
