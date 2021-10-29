@@ -2,18 +2,21 @@ import { Alert } from 'react-bootstrap'
 
 const AlertMessage = ({ variant, children }) => {
   const style = {
-    position: 'sticky',
-    top: '0px',
-    left: '0px',
-    width: '64%',
+    position: 'fixed',
+    top: '88px',
+    left: '20%',
+    width: '60%',
     zIndex: '9999',
-    borderRadius: '0px',
     margin: 'auto',
+    marginTop: '10px',
+    borderRadius: '5px',
+    opacity: '.9',
+    textAlign: 'center',
   }
 
   return (
     <Alert style={style} variant={variant}>
-      {children}
+      <strong className="font-weight-bold">{children}</strong>
     </Alert>
   )
 }

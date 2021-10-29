@@ -1,9 +1,8 @@
 import NoteContext from './NoteContext'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 
 // axios config
-const baseUrl = 'http://localhost:5000/api'
 const headers = {
   Authorization:
     'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MTYxY2U2MGUzZWM1YmRlNTc5NzJiYTMiLCJpYXQiOjE2MzQ1NjY2MTh9.ApN76PWnUjHpsi2CiMPL_PsgZequumJmedQQyUdw2z4',
@@ -11,29 +10,39 @@ const headers = {
 
 const NoteState = props => {
   const [notes, setNotes] = useState([])
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [notesError, setNotesError] = useState(null)
+  const [notesLoading, setNotesLoading] = useState(false)
+  const [notesMessage, setNotesMessage] = useState(null)
+  // const [notes]
+
+  useEffect(() => {
+    setTimeout(() => {
+      setNotesError(null)
+      setNotesMessage(null)
+    }, 3000)
+  }, [notesError, notesMessage])
 
   // fetch all notes
   const fetchNotes = async () => {
     try {
-      setLoading(true)
+      setNotesLoading(true)
       // api call for fetching notes
-      const response = await axios.get(`${baseUrl}/notes/mynotes`, { headers })
+      const response = await axios.get(`api/notes/mynotes`, { headers })
       // updating client side
       const data = response.data
-      setLoading(false)
+      setNotesLoading(false)
       setNotes(data)
-      setError(null)
+      setNotesError(null)
     } catch (err) {
       if (err.response) {
-        setError({ variant: 'danger', message: err.response.data.error })
+        setNotesError({ variant: 'danger', message: err.response.data.error })
       } else if (err.request) {
-        setError({ variant: 'danger', message: 'No response from server' })
+        setNotesError({ variant: 'danger', message: 'No response from server' })
       } else {
-        setError({ variant: 'danger', message: err.message })
+        setNotesError({ variant: 'danger', message: err.message })
       }
-      setLoading(false)
+
+      setNotesLoading(false)
     }
   }
 
@@ -46,26 +55,31 @@ const NoteState = props => {
     }
     try {
       // api call
-      setLoading(true)
-      const { data } = await axios.post(`${baseUrl}/notes/create`, noteBody, {
+      setNotesLoading(true)
+      const { data } = await axios.post(`api/notes/create`, noteBody, {
         headers,
       })
       // update in client
-      setLoading(false)
+      setNotesLoading(false)
       setNotes(notes.concat(data))
-      setError(null)
+      setNotesMessage({
+        variant: 'success',
+        message: 'Note added successfully!',
+      })
+      setNotesError(null)
     } catch (err) {
       if (err.response) {
-        setError({
+        setNotesError({
           variant: 'danger',
           message: `Could not add the note! ${err.response.data.error}`,
         })
       } else if (err.request) {
-        setError({ variant: 'danger', message: 'No response from server' })
+        setNotesError({ variant: 'danger', message: 'No response from server' })
       } else {
-        setError({ variant: 'danger', message: err.message })
+        setNotesError({ variant: 'danger', message: err.message })
       }
-      setLoading(false)
+
+      setNotesLoading(false)
     }
   }
 
@@ -73,9 +87,9 @@ const NoteState = props => {
   const editNote = async (id, title, description, tag) => {
     try {
       // Api call using axios
-      setLoading(true)
+      setNotesLoading(true)
       await axios.patch(
-        `${baseUrl}/notes/mynotes/${id}`,
+        `api/notes/mynotes/${id}`,
         { title, description, tag },
         {
           headers,
@@ -91,24 +105,29 @@ const NoteState = props => {
           newNotes[i].tag = tag
         }
       })
-      setLoading(false)
+      setNotesLoading(false)
       setNotes(newNotes)
-      setError(null)
+      setNotesMessage({
+        variant: 'success',
+        message: 'Note Updated successfully!',
+      })
+      setNotesError(null)
     } catch (err) {
       if (err.response) {
-        setError({
+        setNotesError({
           variant: 'danger',
           message: `Could not update the note! ${err.response.data.error}`,
         })
       } else if (err.request) {
-        setError({
+        setNotesError({
           variant: 'danger',
           message: 'Could not delete the note! No response from server',
         })
       } else {
-        setError({ variant: 'danger', message: err.message })
+        setNotesError({ variant: 'danger', message: err.message })
       }
-      setLoading(false)
+
+      setNotesLoading(false)
     }
   }
 
@@ -116,30 +135,34 @@ const NoteState = props => {
   const deleteNote = async id => {
     try {
       // Api call to delete note in server
-      setLoading(true)
-      await axios.delete(`${baseUrl}/notes/mynotes/${id}`, {
+      setNotesLoading(true)
+      await axios.delete(`api/notes/mynotes/${id}`, {
         headers,
       })
       // Deleting in client
       const newNotes = notes.filter(note => note._id !== id)
-      setLoading(false)
+      setNotesLoading(false)
       setNotes(newNotes)
-      setError(null)
+      setNotesMessage({
+        variant: 'info',
+        message: 'Note was deleted',
+      })
+      setNotesError(null)
     } catch (err) {
       if (err.response) {
-        setError({
+        setNotesError({
           variant: 'danger',
           message: `Could not delete the note! ${err.response.data.error}`,
         })
       } else if (err.request) {
-        setError({
+        setNotesError({
           variant: 'danger',
           message: 'Could not delete the note! No response from server',
         })
       } else {
-        setError({ variant: 'danger', message: err.message })
+        setNotesError({ variant: 'danger', message: err.message })
       }
-      setLoading(false)
+      setNotesLoading(false)
     }
   }
 
@@ -147,8 +170,9 @@ const NoteState = props => {
     <NoteContext.Provider
       value={{
         notes,
-        error,
-        loading,
+        notesError,
+        notesLoading,
+        notesMessage,
         fetchNotes,
         addNote,
         editNote,
