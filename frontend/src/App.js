@@ -9,14 +9,16 @@ import Loader from './components/Loader'
 import AlertMessage from './components/AlertMessage'
 
 // pages
-import Home from './components/Home'
-import About from './components/About'
-import Login from './components/Login'
-import Signup from './components/Signup'
+import Home from './pages/Home'
+import About from './pages/About'
+import Login from './pages/Login'
+import Signup from './pages/Signup'
 
 // context
 import NoteContext from './context/notes/NoteContext'
 import UserContext from './context/users/UserContext'
+import Profile from './pages/Profile'
+import Footer from './components/Footer'
 
 function App() {
   // for note context
@@ -28,7 +30,7 @@ function App() {
   const { userError, userLoading, userMessage } = userContext
 
   return (
-    <>
+    <div className="d-flex flex-column min-vh-100">
       <Header />
       <main className="py-3">
         {notesLoading && <Loader />}
@@ -58,6 +60,9 @@ function App() {
         )}
 
         <Container>
+          <Route path="/profile" exact>
+            <Profile />
+          </Route>
           <Route path="/signup" exact>
             <Signup />
           </Route>
@@ -72,7 +77,8 @@ function App() {
           </Route>
         </Container>
       </main>
-    </>
+      <Footer />
+    </div>
   )
 }
 

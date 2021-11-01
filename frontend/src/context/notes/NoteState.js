@@ -1,11 +1,19 @@
-import NoteContext from './NoteContext'
 import { useEffect, useState } from 'react'
+import NoteContext from './NoteContext'
 import axios from 'axios'
 
-// axios config
-const headers = {
-  Authorization:
-    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MTYxY2U2MGUzZWM1YmRlNTc5NzJiYTMiLCJpYXQiOjE2MzQ1NjY2MTh9.ApN76PWnUjHpsi2CiMPL_PsgZequumJmedQQyUdw2z4',
+// Function for cleaning null, undefined and empty strings values in objects
+function clean(obj) {
+  for (var propName in obj) {
+    if (
+      obj[propName] === null ||
+      obj[propName] === undefined ||
+      obj[propName] === ''
+    ) {
+      delete obj[propName]
+    }
+  }
+  return obj
 }
 
 const NoteState = props => {
@@ -22,10 +30,17 @@ const NoteState = props => {
     }, 3000)
   }, [notesError, notesMessage])
 
-  // fetch all notes
+  // -----------------------------------------------------------------
+  // Fetch all notes
+  // -----------------------------------------------------------------
   const fetchNotes = async () => {
     try {
       setNotesLoading(true)
+      // for getting the newly saved token from the local storage we have written this extra code for this pariticular function
+      const userToken = JSON.parse(localStorage.getItem('userToken'))
+      const headers = {
+        Authorization: `Bearer ${userToken && userToken}`,
+      }
       // api call for fetching notes
       const response = await axios.get(`api/notes/mynotes`, { headers })
       // updating client side
@@ -41,21 +56,27 @@ const NoteState = props => {
       } else {
         setNotesError({ variant: 'danger', message: err.message })
       }
-
+      setNotes([])
       setNotesLoading(false)
     }
   }
 
+  // -----------------------------------------------------------------
   // Add a note
+  // -----------------------------------------------------------------
   const addNote = async (title, description, tag) => {
-    const noteBody = {
+    const noteBody = clean({
       title,
       description,
       tag,
-    }
+    })
     try {
       // api call
       setNotesLoading(true)
+      const userToken = JSON.parse(localStorage.getItem('userToken'))
+      const headers = {
+        Authorization: `Bearer ${userToken && userToken}`,
+      }
       const { data } = await axios.post(`api/notes/create`, noteBody, {
         headers,
       })
@@ -83,18 +104,21 @@ const NoteState = props => {
     }
   }
 
+  // -----------------------------------------------------------------
   // Edit a note
+  // -----------------------------------------------------------------
   const editNote = async (id, title, description, tag) => {
     try {
       // Api call using axios
       setNotesLoading(true)
-      await axios.patch(
-        `api/notes/mynotes/${id}`,
-        { title, description, tag },
-        {
-          headers,
-        }
-      )
+      const userToken = JSON.parse(localStorage.getItem('userToken'))
+      const noteBody = clean({ title, description, tag })
+      const headers = {
+        Authorization: `Bearer ${userToken && userToken}`,
+      }
+      await axios.patch(`api/notes/mynotes/${id}`, noteBody, {
+        headers,
+      })
       // Updating in client
       // fetchNotes() : this will invoke another api call which results in high load on server
       const newNotes = notes.slice()
@@ -131,11 +155,17 @@ const NoteState = props => {
     }
   }
 
+  // -----------------------------------------------------------------
   // Delete a note
+  // -----------------------------------------------------------------
   const deleteNote = async id => {
     try {
       // Api call to delete note in server
       setNotesLoading(true)
+      const userToken = JSON.parse(localStorage.getItem('userToken'))
+      const headers = {
+        Authorization: `Bearer ${userToken && userToken}`,
+      }
       await axios.delete(`api/notes/mynotes/${id}`, {
         headers,
       })

@@ -1,9 +1,28 @@
-import { Navbar, Container, Nav } from 'react-bootstrap'
+import { useContext } from 'react'
+import { Navbar, Container, Nav, NavDropdown } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
+import UserContext from '../context/users/UserContext'
+import { useHistory } from 'react-router-dom'
 
 const Header = () => {
+  const history = useHistory()
+
+  // for user context
+  const userContext = useContext(UserContext)
+  const { logout, user } = userContext
+
+  const logoutHandler = () => {
+    logout()
+    history.push('/login')
+  }
+
   return (
-    <Navbar bg="primary" variant="dark" expand="lg" collapseOnSelect>
+    <Navbar
+      className="sticky-top"
+      bg="primary"
+      variant="dark"
+      expand="lg"
+      collapseOnSelect>
       <Container>
         <LinkContainer to="/">
           <Navbar.Brand>Notes Infinity</Navbar.Brand>
@@ -17,12 +36,31 @@ const Header = () => {
             <LinkContainer to="/about">
               <Nav.Link>About</Nav.Link>
             </LinkContainer>
-            <LinkContainer to="/login">
-              <Nav.Link>Login</Nav.Link>
-            </LinkContainer>
-            <LinkContainer to="/signup">
-              <Nav.Link>Signup</Nav.Link>
-            </LinkContainer>
+            {user ? (
+              <NavDropdown title={user.name} id="username">
+                <LinkContainer to="/profile">
+                  <NavDropdown.Item>
+                    <i className="fas fa-user"></i> Profile
+                  </NavDropdown.Item>
+                </LinkContainer>
+                <NavDropdown.Item onClick={logoutHandler}>
+                  <i className="fas fa-sign-out-alt"></i> Logout
+                </NavDropdown.Item>
+              </NavDropdown>
+            ) : (
+              <>
+                <LinkContainer to="/login">
+                  <Nav.Link>
+                    <i className="fas fa-sign-in-alt"></i> Login
+                  </Nav.Link>
+                </LinkContainer>
+                <LinkContainer to="/signup">
+                  <Nav.Link>
+                    <i className="fas fa-user-plus"></i> Signup
+                  </Nav.Link>
+                </LinkContainer>
+              </>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>

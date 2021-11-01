@@ -62,7 +62,7 @@ const AddNote = () => {
           <Form.Control
             type="text"
             name="tag"
-            placeholder="Enter tag"
+            placeholder="Default: general"
             value={note.tag}
             onChange={onChangeHandler}
           />

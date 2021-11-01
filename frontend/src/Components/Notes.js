@@ -8,6 +8,8 @@ const Notes = () => {
   const context = useContext(NoteContext)
   const { notes, fetchNotes } = context
 
+  const userInfo = JSON.parse(localStorage.getItem('userInfo'))
+
   useEffect(() => {
     fetchNotes()
     // eslint-disable-next-line
@@ -20,12 +22,24 @@ const Notes = () => {
       <h2 className="my-3">Your Notes</h2>
 
       <>
-        {notes.length === 0 && (
-          <Alert variant="success">
-            <Alert.Heading>Note notes to show</Alert.Heading>
-            <p>Please add a note to dispaly here</p>
-          </Alert>
+        {!userInfo ? (
+          <>
+            <Alert variant="info">
+              <Alert.Heading>Note notes to show</Alert.Heading>
+              <p>Please login to the app to view your notes</p>
+            </Alert>
+          </>
+        ) : (
+          <>
+            {notes.length === 0 && (
+              <Alert variant="info">
+                <Alert.Heading>Note notes to show</Alert.Heading>
+                <p>Please add a note to dispaly here</p>
+              </Alert>
+            )}
+          </>
         )}
+
         <Row>
           {notes.map(note => (
             <Col key={note._id} md={4} sm={6} lg={3}>

@@ -87,11 +87,11 @@ userSchema.methods.generateAuthToken = async function () {
 userSchema.statics.findByCredentials = async (email, password) => {
   const user = await User.findOne({ email })
   if (!user) {
-    throw new Error('Unable to login!')
+    throw new Error('Invalid Email or Password!')
   }
   const isMatch = await bcrypt.compare(password, user.password)
   if (!isMatch) {
-    throw new Error('Unable to login!')
+    throw new Error('Invalid Email or Password!')
   }
   return user
 }
@@ -104,6 +104,15 @@ userSchema.pre('save', async function (next) {
     user.password = await bcrypt.hash(user.password, salt)
   }
   next()
+})
+
+// Middleware function for unique email error
+userSchema.post('save', function (error, doc, next) {
+  if (error.name === 'MongoServerError' && error.code === 11000) {
+    next(new Error('Email already taken!'))
+  } else {
+    next()
+  }
 })
 
 // deleting the user notes when the user profile deletion

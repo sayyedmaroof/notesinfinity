@@ -9,10 +9,6 @@ const router = express.Router()
 // @access Public
 router.post('/register', async (req, res) => {
   try {
-    const emailExists = await User.findOne({ email: req.body.email })
-    if (emailExists) {
-      throw new Error('Email already taken!')
-    }
     const user = new User(req.body)
     await user.save()
     const token = await user.generateAuthToken()
@@ -83,10 +79,6 @@ router.patch('/me', auth, async (req, res) => {
 
   updates.forEach(update => (req.user[update] = req.body[update]))
   try {
-    const emailExists = await User.findOne({ email: req.body.email })
-    if (emailExists) {
-      throw new Error('Email already taken!')
-    }
     await req.user.save()
     res.json(req.user)
   } catch (e) {
