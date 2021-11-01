@@ -34,12 +34,40 @@ const UserState = props => {
   const [userLoading, setUserLoading] = useState(false)
   const [userMessage, setUserMessage] = useState(null)
 
+  // for disabling the alert messages after 3 seconds
   useEffect(() => {
     setTimeout(() => {
       setUserMessage(null)
       setUserError(null)
     }, 3000)
   }, [userMessage, userError])
+
+  // Error handler funtion
+  const errorHandler = (err, info) => {
+    if (info === undefined || null) {
+      info = ''
+    }
+    if (err.response) {
+      if (
+        err.response.status === 401 &&
+        err.response.statusText === 'Unauthorized'
+      ) {
+        localStorage.removeItem('userInfo')
+      }
+      setUserError({
+        variant: 'danger',
+        message: `${info} ${err.response.data.error}`,
+      })
+    } else if (err.request) {
+      setUserError({
+        variant: 'danger',
+        message: `${info} No response from server`,
+      })
+    } else {
+      setUserError({ variant: 'danger', message: err.message })
+    }
+    setUserLoading(false)
+  }
 
   // -----------------------------------------------------------------
   // Login user
@@ -59,15 +87,7 @@ const UserState = props => {
       setUserMessage({ variant: 'success', message: 'Logged In successfully' })
       history.push('/')
     } catch (err) {
-      if (err.response) {
-        setUserError({ variant: 'danger', message: err.response.data.error })
-      } else if (err.request) {
-        setUserError({ variant: 'danger', message: 'No response from server' })
-      } else {
-        setUserError({ variant: 'danger', message: err.message })
-      }
-
-      setUserLoading(false)
+      errorHandler(err)
     }
   }
 
@@ -87,15 +107,7 @@ const UserState = props => {
       setUserMessage({ variant: 'success', message: 'Signed up successfully' })
       history.push('/')
     } catch (err) {
-      if (err.response) {
-        setUserError({ variant: 'danger', message: err.response.data.error })
-      } else if (err.request) {
-        setUserError({ variant: 'danger', message: 'No response from server' })
-      } else {
-        setUserError({ variant: 'danger', message: err.message })
-      }
-
-      setUserLoading(false)
+      errorHandler(err)
     }
   }
 
@@ -116,14 +128,31 @@ const UserState = props => {
       setUserMessage({ variant: 'dark', message: 'You have logged out!' })
       history.push('/login')
     } catch (err) {
-      if (err.response) {
-        setUserError({ variant: 'danger', message: err.response.data.error })
-      } else if (err.request) {
-        setUserError({ variant: 'danger', message: 'No response from server' })
-      } else {
-        setUserError({ variant: 'danger', message: err.message })
-      }
+      errorHandler(err)
+    }
+  }
+
+  // -----------------------------------------------------------------
+  // Logout from all devices
+  // -----------------------------------------------------------------
+  const logoutAll = async () => {
+    try {
+      setUserLoading(true)
+      await axios.post(`api/users/logoutall`, null, {
+        headers,
+      })
+      localStorage.removeItem('userInfo')
+      localStorage.removeItem('userToken')
+      setUser(null)
+      setUserError(null)
       setUserLoading(false)
+      setUserMessage({
+        variant: 'dark',
+        message: 'You have successfully logged out from all devices!',
+      })
+      history.push('/login')
+    } catch (err) {
+      errorHandler(err)
     }
   }
 
@@ -138,14 +167,7 @@ const UserState = props => {
       setUserLoading(false)
       return data
     } catch (err) {
-      if (err.response) {
-        setUserError({ variant: 'danger', message: err.response.data.error })
-      } else if (err.request) {
-        setUserError({ variant: 'danger', message: 'No response from server' })
-      } else {
-        setUserError({ variant: 'danger', message: err.message })
-      }
-      setUserLoading(false)
+      errorHandler(err)
     }
   }
 
@@ -167,23 +189,7 @@ const UserState = props => {
       })
       return data
     } catch (err) {
-      if (err.response) {
-        setUserError({
-          variant: 'danger',
-          message: `Could not update your profile! ${err.response.data.error}`,
-        })
-      } else if (err.request) {
-        setUserError({
-          variant: 'danger',
-          message: 'Could note update your profile! No response from server',
-        })
-      } else {
-        setUserError({
-          variant: 'danger',
-          message: `Could not update your profile! ${err.message}`,
-        })
-      }
-      setUserLoading(false)
+      errorHandler(err, 'Could not update your profile!')
     }
   }
 
@@ -197,6 +203,7 @@ const UserState = props => {
         login,
         signup,
         logout,
+        logoutAll,
         readProfile,
         editProfile,
       }}>

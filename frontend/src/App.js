@@ -1,4 +1,3 @@
-import './App.css'
 import { useContext } from 'react'
 import { Route } from 'react-router-dom'
 

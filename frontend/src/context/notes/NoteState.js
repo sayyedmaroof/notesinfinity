@@ -21,7 +21,6 @@ const NoteState = props => {
   const [notesError, setNotesError] = useState(null)
   const [notesLoading, setNotesLoading] = useState(false)
   const [notesMessage, setNotesMessage] = useState(null)
-  // const [notes]
 
   useEffect(() => {
     setTimeout(() => {
@@ -29,6 +28,30 @@ const NoteState = props => {
       setNotesMessage(null)
     }, 3000)
   }, [notesError, notesMessage])
+
+  // Error Handler function
+  const errorHandler = (err, info) => {
+    if (err.response) {
+      if (
+        err.response.status === 401 &&
+        err.response.statusText === 'Unauthorized'
+      ) {
+        localStorage.removeItem('userInfo')
+      }
+      setNotesError({
+        variant: 'danger',
+        message: `${info} ${err.response.data.error}`,
+      })
+    } else if (err.request) {
+      setNotesError({
+        variant: 'danger',
+        message: `${info} No response from server!`,
+      })
+    } else {
+      setNotesError({ variant: 'danger', message: err.message })
+    }
+    setNotesLoading(false)
+  }
 
   // -----------------------------------------------------------------
   // Fetch all notes
@@ -49,15 +72,7 @@ const NoteState = props => {
       setNotes(data)
       setNotesError(null)
     } catch (err) {
-      if (err.response) {
-        setNotesError({ variant: 'danger', message: err.response.data.error })
-      } else if (err.request) {
-        setNotesError({ variant: 'danger', message: 'No response from server' })
-      } else {
-        setNotesError({ variant: 'danger', message: err.message })
-      }
-      setNotes([])
-      setNotesLoading(false)
+      errorHandler(err, 'Could not fetch notes!')
     }
   }
 
@@ -89,18 +104,7 @@ const NoteState = props => {
       })
       setNotesError(null)
     } catch (err) {
-      if (err.response) {
-        setNotesError({
-          variant: 'danger',
-          message: `Could not add the note! ${err.response.data.error}`,
-        })
-      } else if (err.request) {
-        setNotesError({ variant: 'danger', message: 'No response from server' })
-      } else {
-        setNotesError({ variant: 'danger', message: err.message })
-      }
-
-      setNotesLoading(false)
+      errorHandler(err, 'Could not add the note!')
     }
   }
 
@@ -137,21 +141,7 @@ const NoteState = props => {
       })
       setNotesError(null)
     } catch (err) {
-      if (err.response) {
-        setNotesError({
-          variant: 'danger',
-          message: `Could not update the note! ${err.response.data.error}`,
-        })
-      } else if (err.request) {
-        setNotesError({
-          variant: 'danger',
-          message: 'Could not delete the note! No response from server',
-        })
-      } else {
-        setNotesError({ variant: 'danger', message: err.message })
-      }
-
-      setNotesLoading(false)
+      errorHandler(err, 'Could not update the note!')
     }
   }
 
@@ -179,20 +169,7 @@ const NoteState = props => {
       })
       setNotesError(null)
     } catch (err) {
-      if (err.response) {
-        setNotesError({
-          variant: 'danger',
-          message: `Could not delete the note! ${err.response.data.error}`,
-        })
-      } else if (err.request) {
-        setNotesError({
-          variant: 'danger',
-          message: 'Could not delete the note! No response from server',
-        })
-      } else {
-        setNotesError({ variant: 'danger', message: err.message })
-      }
-      setNotesLoading(false)
+      errorHandler(err, 'Could not delete the note!')
     }
   }
 

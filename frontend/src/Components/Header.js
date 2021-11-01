@@ -9,10 +9,15 @@ const Header = () => {
 
   // for user context
   const userContext = useContext(UserContext)
-  const { logout, user } = userContext
+  const { logout, logoutAll, user } = userContext
 
   const logoutHandler = () => {
     logout()
+    history.push('/login')
+  }
+
+  const logoutAllHandler = () => {
+    logoutAll()
     history.push('/login')
   }
 
@@ -45,6 +50,10 @@ const Header = () => {
                 </LinkContainer>
                 <NavDropdown.Item onClick={logoutHandler}>
                   <i className="fas fa-sign-out-alt"></i> Logout
+                </NavDropdown.Item>
+                <NavDropdown.Item onClick={logoutAllHandler}>
+                  <i className="fas fa-sign-out-alt"></i> Logout All <br />
+                  Devices
                 </NavDropdown.Item>
               </NavDropdown>
             ) : (
