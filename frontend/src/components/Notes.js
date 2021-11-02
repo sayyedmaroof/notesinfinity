@@ -1,5 +1,6 @@
 import { useContext, useEffect } from 'react'
 import NoteContext from '../context/notes/NoteContext'
+import { Link } from 'react-router-dom'
 import { Alert, Col, Row } from 'react-bootstrap'
 import AddNote from './AddNote'
 import NoteItem from './NoteItem'
@@ -27,6 +28,12 @@ const Notes = () => {
             <Alert variant="info">
               <Alert.Heading>Note notes to show</Alert.Heading>
               <p>Please login to the app to view your notes</p>
+              <p>
+                Already have an account? <Link to="/login">Login</Link>
+              </p>
+              <p>
+                New User? <Link to="/signup">Signup</Link>
+              </p>
             </Alert>
           </>
         ) : (

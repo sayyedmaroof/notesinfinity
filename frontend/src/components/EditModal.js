@@ -53,7 +53,7 @@ const EditModal = props => {
                 <b>Description</b>
               </Form.Label>
               <Form.Control
-                type="text"
+                as="textarea"
                 name="description"
                 value={note.description}
                 placeholder="Enter description"

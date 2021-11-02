@@ -89,7 +89,7 @@ const Login = () => {
                 </Form.Group>
 
                 <Button variant="primary" type="submit" disabled={isSubmitting}>
-                  Signup
+                  Login
                 </Button>
               </Form>
               <Row className="py-3">

@@ -46,7 +46,7 @@ const AddNote = () => {
             <b>Description</b>
           </Form.Label>
           <Form.Control
-            type="text"
+            as="textarea"
             name="description"
             placeholder="Enter description"
             value={note.description}
