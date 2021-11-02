@@ -27,9 +27,6 @@ const EditProfileModal = () => {
   }
 
   const handleSave = () => {
-    // editNote(note._id, note.title, note.description, note.tag)
-
-    console.log('This will update the profile')
     editProfile(user.name, user.email, user.age, user.password)
     setShow(false)
   }

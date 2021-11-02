@@ -193,6 +193,24 @@ const UserState = props => {
     }
   }
 
+  // -----------------------------------------------------------------
+  // Delete Profile
+  // -----------------------------------------------------------------
+  const deleteProfile = async () => {
+    try {
+      setUserLoading(false)
+      await axios.delete('api/users/me', { headers })
+      localStorage.removeItem('userInfo')
+      setUser(null)
+      setUserError(null)
+      setUserLoading(false)
+      setUserMessage({ variant: 'danger', message: 'Profile deleted' })
+      history.push('/login')
+    } catch (err) {
+      errorHandler(err)
+    }
+  }
+
   return (
     <UserContext.Provider
       value={{
@@ -206,6 +224,7 @@ const UserState = props => {
         logoutAll,
         readProfile,
         editProfile,
+        deleteProfile,
       }}>
       {props.children}
     </UserContext.Provider>

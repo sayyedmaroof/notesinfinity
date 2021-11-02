@@ -1,6 +1,7 @@
 import { useContext, useEffect } from 'react'
-import { Button, Card, Col, Row } from 'react-bootstrap'
+import { Card, Col, Row } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
+import DeleteProfileModal from '../components/DeleteProfileModal'
 import EditProfileModal from '../components/EditProfileModal'
 import UserContext from '../context/users/UserContext'
 
@@ -55,7 +56,7 @@ const Profile = () => {
             <Card.Footer text="white">
               <div className="d-grid gap-2">
                 <EditProfileModal />
-                <Button variant="danger mb-2">Block level button</Button>
+                <DeleteProfileModal />
               </div>
             </Card.Footer>
           </Card>
