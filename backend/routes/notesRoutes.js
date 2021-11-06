@@ -23,11 +23,35 @@ router.post('/create', auth, async (req, res) => {
 // @desc Fetch user notes
 // @route GET '/api/notes/mynotes'
 // @access Private
+
 router.get('/mynotes', auth, async (req, res) => {
   try {
-    // const notes = await Note.find({ user: req.user._id })
-    await req.user.populate('notes')
-    res.json(req.user.notes)
+    // await req.user.populate('notes') : this was the previous code but to refactor and add filter and pagination we had to comment out this line and written the newest code as follows
+    let searchQuery = ''
+    if (req.query.keyword) {
+      searchQuery = String(req.query.keyword)
+    }
+    const findQuery = {
+      $and: [
+        { user: req.user._id },
+        {
+          $or: [
+            { title: { $regex: searchQuery, $options: 'i' } },
+            { description: { $regex: searchQuery, $options: 'i' } },
+            { tag: { $regex: searchQuery, $options: 'i' } },
+          ],
+        },
+      ],
+    }
+    const notes = await Note.find(findQuery)
+      .limit(parseInt(req.query.limit))
+      .skip(parseInt(req.query.skip))
+      .sort('-createdAt')
+
+    const results = await Note.find(findQuery)
+
+    const data = { notes, totalResults: results.length }
+    res.json(data)
   } catch (e) {
     res.status(500).json({ error: e.message })
   }

@@ -56,7 +56,7 @@ const NoteState = props => {
   // -----------------------------------------------------------------
   // Fetch all notes
   // -----------------------------------------------------------------
-  const fetchNotes = async () => {
+  const fetchNotes = async (limit, skip, keyword) => {
     try {
       setNotesLoading(true)
       // for getting the newly saved token from the local storage we have written this extra code for this pariticular function
@@ -65,12 +65,16 @@ const NoteState = props => {
         Authorization: `Bearer ${userToken && userToken}`,
       }
       // api call for fetching notes
-      const response = await axios.get(`api/notes/mynotes`, { headers })
+      const { data } = await axios.get(`api/notes/mynotes`, {
+        params: { limit, skip, keyword },
+        headers,
+      })
       // updating client side
-      const data = response.data
+      const fetchedNotes = data.notes
       setNotesLoading(false)
-      setNotes(data)
+      setNotes(fetchedNotes)
       setNotesError(null)
+      return data.totalResults
     } catch (err) {
       errorHandler(err, 'Could not fetch notes!')
     }
@@ -97,7 +101,8 @@ const NoteState = props => {
       })
       // update in client
       setNotesLoading(false)
-      setNotes(notes.concat(data))
+      notes.unshift(data)
+      setNotes(notes)
       setNotesMessage({
         variant: 'success',
         message: 'Note added successfully!',
