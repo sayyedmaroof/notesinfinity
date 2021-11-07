@@ -23,10 +23,8 @@ router.post('/create', auth, async (req, res) => {
 // @desc Fetch user notes
 // @route GET '/api/notes/mynotes'
 // @access Private
-
 router.get('/mynotes', auth, async (req, res) => {
   try {
-    // await req.user.populate('notes') : this was the previous code but to refactor and add filter and pagination we had to comment out this line and written the newest code as follows
     let searchQuery = ''
     if (req.query.keyword) {
       searchQuery = String(req.query.keyword)
