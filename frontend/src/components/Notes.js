@@ -16,7 +16,7 @@ import AddNote from './AddNote'
 import NoteItem from './NoteItem'
 
 const Notes = () => {
-  const limit = 10
+  const limit = 8
   const [skip, setSkip] = useState(0)
   const [keyWord, setKeyWord] = useState('')
   const [totalResults, setTotalResults] = useState(0)
@@ -51,12 +51,10 @@ const Notes = () => {
     if (skip > 0) {
       setSkip(skip - limit)
     }
-    // await fetchNotes(limit, skip, keyWord)
   }
 
   const handleNextClick = async () => {
     setSkip(skip + limit)
-    await fetchNotes(limit, skip, keyWord)
   }
 
   return (
@@ -135,9 +133,12 @@ const Notes = () => {
                   </Button>
                 )}
 
-                <div className="text-muted text-center mx-2">
-                  Showing {limit < totalResults ? limit : totalResults} notes
-                  out of {totalResults}
+                <div className="text-center mx-2">
+                  Page-{skip / limit + 1},
+                  <span className="text-muted">
+                    {' '}
+                    Showing {notes.length} out of {totalResults} notes.
+                  </span>
                 </div>
 
                 {notesLoading ? (
