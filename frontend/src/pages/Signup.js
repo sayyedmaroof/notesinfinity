@@ -60,7 +60,7 @@ const Signup = () => {
         <>
           <Row className="justify-content-md-center">
             <Col xs={12} md={6}>
-              <h2>Welcome to signup page</h2>
+              <h2>Signup</h2>
 
               <Form noValidate onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">

@@ -198,7 +198,7 @@ const UserState = props => {
   // -----------------------------------------------------------------
   const deleteProfile = async () => {
     try {
-      setUserLoading(false)
+      setUserLoading(true)
       await axios.delete('api/users/me', { headers })
       localStorage.removeItem('userInfo')
       setUser(null)
@@ -206,6 +206,42 @@ const UserState = props => {
       setUserLoading(false)
       setUserMessage({ variant: 'danger', message: 'Profile deleted' })
       history.push('/login')
+    } catch (err) {
+      errorHandler(err)
+    }
+  }
+
+  // -----------------------------------------------------------------
+  // Upload user profile picture
+  // -----------------------------------------------------------------
+  const uploadPicture = async fd => {
+    try {
+      setUserLoading(true)
+      await axios.post('api/users/me/avatar', fd, { headers })
+      setUserError(null)
+      setUserLoading(false)
+      setUserMessage({
+        variant: 'success',
+        message: 'Your profile picture was uploaded successfully',
+      })
+    } catch (err) {
+      errorHandler(err)
+    }
+  }
+
+  // -----------------------------------------------------------------
+  // Delete user profile picture
+  // -----------------------------------------------------------------
+  const deleteProfilePicture = async () => {
+    try {
+      setUserLoading(true)
+      await axios.delete('api/users/me/avatar', { headers })
+      setUserError(null)
+      setUserLoading(false)
+      setUserMessage({
+        variant: 'warning',
+        message: 'Your profile picture was deleted',
+      })
     } catch (err) {
       errorHandler(err)
     }
@@ -225,6 +261,8 @@ const UserState = props => {
         readProfile,
         editProfile,
         deleteProfile,
+        uploadPicture,
+        deleteProfilePicture,
       }}>
       {props.children}
     </UserContext.Provider>

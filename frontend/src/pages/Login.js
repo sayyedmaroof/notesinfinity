@@ -48,7 +48,7 @@ const Login = () => {
         <>
           <Row className="justify-content-md-center">
             <Col xs={12} md={6}>
-              <h3>This is login page and you can login </h3>
+              <h3>Login</h3>
               <Form noValidate onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
                   <Form.Label>Email address</Form.Label>

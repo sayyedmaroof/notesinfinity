@@ -33,7 +33,7 @@ const EditProfileModal = () => {
 
   return (
     <>
-      <Button variant="secondary" className="mb-2" onClick={handleShow}>
+      <Button variant="primary" className="mb-2" onClick={handleShow}>
         <i className="fas fa-edit"></i> Edit Profile
       </Button>
 
